@@ -15,6 +15,7 @@ class vec {
   std::vector<double> data;
 
  public:
+  vec() = default;
   vec(size_t n) : data(n, 0.0) {}
 
   vec(const vec&) = default;
