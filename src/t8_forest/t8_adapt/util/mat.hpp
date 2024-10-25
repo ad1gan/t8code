@@ -7,10 +7,13 @@ namespace t8_mra::util {
 
 class mat {
   std::vector<double> data;
-  size_t m, n;
+  size_t num_rows = 0u;
+  size_t num_cols = 0u;
 
  public:
-  mat(size_t _m, size_t _n) : data(_m * _n, 0.0), m(_m), n(_n) {}
+  mat() = default;
+  mat(size_t _rows, size_t _cols)
+      : data(_rows * _cols, {}), num_rows(_rows), num_cols(_cols) {}
 
   mat(const mat&) = default;
   mat& operator=(const mat&) = default;
@@ -28,35 +31,36 @@ class mat {
   size_t cols() const noexcept;
 
   // LR-Decomposition
-  void lr_factors(mat& A, std::vector<size_t>& r);
-  void lr_solve(const mat& A, const std::vector<size_t>& r, vec& x);
+  // void lr_factors(mat& A, std::vector<size_t>& r);
+  // void lr_solve(const mat& A, const std::vector<size_t>& r, vec& x);
 };
 
 inline double& mat::operator()(size_t i, size_t j) {
-  if (i >= m || j >= n)
+  if (i >= num_rows || j >= num_cols)
     throw std::out_of_range(
         "indices in t8_mra::util::mat::operator() is out of range");
 
-  return data[m * j + i];
+  return data[num_rows * j + i];
 }
 
 inline double mat::operator()(size_t i, size_t j) const {
-  if (i >= m || j >= n)
+  if (i >= num_rows || j >= num_cols)
     throw std::out_of_range(
         "indices in t8_mra::util::mat::operator() is out of range");
 
-  return data[m * j + i];
+  return data[num_rows * j + i];
 }
 
-inline void mat::resize(size_t _m, size_t _n) {
+inline void mat::resize(size_t _rows, size_t _cols) {
   data.clear();
-  m = _m;
-  n = _n;
-  data.resize(_m * _n);
+  num_rows = _rows;
+  num_cols = _cols;
+  data.resize(_rows * _cols);
 }
 
-inline size_t mat::rows() const noexcept { return m; }
-inline size_t mat::cols() const noexcept { return n; }
+inline size_t mat::rows() const noexcept { return num_rows; }
+inline size_t mat::cols() const noexcept { return num_cols; }
+
 
 inline void mat::lr_factors(mat& A, std::vector<size_t>& r) {
   const auto n = A.rows();
