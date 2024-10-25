@@ -110,7 +110,9 @@ add_t8_test( NAME t8_gtest_iterate_replace_serial       SOURCES t8_gtest_main.cx
 add_t8_test( NAME t8_gtest_empty_local_tree_parallel    SOURCES t8_gtest_main.cxx t8_forest_incomplete/t8_gtest_empty_local_tree.cxx )
 add_t8_test( NAME t8_gtest_empty_global_tree_parallel   SOURCES t8_gtest_main.cxx t8_forest_incomplete/t8_gtest_empty_global_tree.cxx )
 
-add_t8_test( NAME t8_gtest_mra_serial   SOURCES t8_gtest_main.cxx t8_forest/t8_adapt/t8_gtest_mra.cxx )
+add_t8_test( NAME t8_gtest_adapt_vec_serial   SOURCES t8_gtest_main.cxx t8_forest/t8_adapt/util/t8_gtest_vec.cxx )
+add_t8_test( NAME t8_gtest_adapt_mat_serial   SOURCES t8_gtest_main.cxx t8_forest/t8_adapt/util/t8_gtest_mat.cxx )
+add_t8_test( NAME t8_gtest_adapt_mra_serial   SOURCES t8_gtest_main.cxx t8_forest/t8_adapt/t8_gtest_mra.cxx )
 
 add_t8_test( NAME t8_gtest_geometry_cad_serial                      SOURCES t8_gtest_main.cxx t8_geometry/t8_geometry_implementations/t8_gtest_geometry_cad.cxx )
 add_t8_test( NAME t8_gtest_geometry_linear_serial                   SOURCES t8_gtest_main.cxx t8_geometry/t8_geometry_implementations/t8_gtest_geometry_linear.cxx )
