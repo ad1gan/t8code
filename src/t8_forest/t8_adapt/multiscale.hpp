@@ -35,14 +35,14 @@ struct t8_data_per_element {
 
 template <int D>
 struct t8_multiscale {
-  int polynomial_degree;
-  int dof;
-  int max_level;
+  size_t polynomial_degree;
+  size_t dof;
+  size_t max_level;
 
   std::vector<t8_mra::util::mat> mask_coeffs;
   std::vector<t8_mra::util::mat> inv_mask_coeffs;
 
-  t8_multiscale(int _p, int _max_level)
+  t8_multiscale(size_t _p, size_t _max_level)
       : polynomial_degree(_p),
         dof((_p * (_p + 1)) / 2),
         max_level(_max_level),
