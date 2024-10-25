@@ -90,7 +90,17 @@ inline void mat::lr_factors(mat& A, std::vector<size_t>& r) {
   }
 }
 
-inline void mat::lr_solve(const mat& A, const std::vector<size_t>& r, vec& x) {
+inline void lr_solve(const mat& A, const std::vector<size_t>& r, vec& x) {
+  if (A.rows() != A.cols())
+    throw std::logic_error(
+        "Matrix in t8_mra::util::lr_solve is not a square matrix");
+  if (A.rows() != r.size())
+    throw std::logic_error(
+        "Permutation vector in t8_mra::util::lr_solve does not fit");
+  if (A.rows() != x.size())
+    throw std::logic_error(
+        "Solution vector in t8_mra::util::lr_solve does not fit");
+
   const auto n = A.rows();
 
   for (auto i = 0u; i < n; i++)
