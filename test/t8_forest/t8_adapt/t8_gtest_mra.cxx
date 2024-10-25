@@ -3,7 +3,7 @@
 
 #include <t8_forest/t8_adapt/multiscale.hpp>
 
-class t8_mra_test : public ::testing::Test {
+class t8_adapt_mra_test : public ::testing::Test {
   void SetUp() {}
 
  public:
@@ -11,7 +11,7 @@ class t8_mra_test : public ::testing::Test {
   size_t p = 3;
 };
 
-TEST_F(t8_mra_test, cstr) {
+TEST_F(t8_adapt_mra_test, cstr) {
   t8_mra::t8_multiscale<2> mra(p, max_level);
 
   ASSERT_EQ(max_level, mra.max_level);
