@@ -1,6 +1,6 @@
 #pragma once
 
-#include <t8_adapt/util/vec.hpp>
+#include <t8_forest/t8_adapt/util/vec.hpp>
 #include <vector>
 
 namespace t8_mra::util {

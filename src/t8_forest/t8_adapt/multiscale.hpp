@@ -4,7 +4,7 @@
 // #include <t8.h>
 
 #include <cstddef>
-#include <t8_adapt/util/mat.hpp>
+#include <t8_forest/t8_adapt/util/mat.hpp>
 #include <vector>
 
 namespace t8_mra {
@@ -28,9 +28,9 @@ struct children {
 
 /// TODO How do we control that for each D,U,P combination?
 struct t8_data_per_element {
-  int level;       /// Current refinement level
-  double volumen;  /// Cell volume
-  double u[];      /// DG-coefficients
+  int level;              /// Current refinement level
+  double volumen;         /// Cell volume
+  std::vector<double> u;  /// DG-coefficients
 };
 
 template <int D>

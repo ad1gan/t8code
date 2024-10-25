@@ -1,8 +1,8 @@
 /// Collect all mask_coefficients for all different shapes
 
 #include <cmath>
-#include <t8_adapt/t8_maskcoeff/mask_coeff_2D_triangle.hpp>
-#include <t8_adapt/util/mat.hpp>
+#include <t8_forest/t8_adapt/t8_maskcoeff/mask_coeff_2D_triangle.hpp>
+#include <t8_forest/t8_adapt/util/mat.hpp>
 // T8_EXTERN_C_BEGIN ();
 
 using namespace std;
