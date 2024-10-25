@@ -21,6 +21,8 @@ TEST_F(t8_adapt_vec_test, cstr) {
   /// move cstr/assignment
   t8_mra::util::vec bar3(std::move(bar1));
   t8_mra::util::vec bar4 = std::move(foo2);
+
+  for (auto i = 0u; i < bar4.size(); ++i) ASSERT_EQ(bar4(i), 0.0);
 }
 
 TEST_F(t8_adapt_vec_test, size) {
@@ -29,6 +31,14 @@ TEST_F(t8_adapt_vec_test, size) {
 
   ASSERT_EQ(foo1.size(), 0u);
   ASSERT_EQ(foo2.size(), n);
+}
+
+TEST_F(t8_adapt_vec_test, resize) {
+  t8_mra::util::vec foo(n);
+  foo.resize(20u);
+
+  ASSERT_EQ(foo.size(), 20u);
+  for (auto i = 0u; i < foo.size(); ++i) ASSERT_EQ(foo(i), 0.0);
 }
 
 TEST_F(t8_adapt_vec_test, access_operator) {
