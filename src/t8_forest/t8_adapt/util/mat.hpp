@@ -61,30 +61,39 @@ inline void mat::resize(size_t _rows, size_t _cols) {
 inline size_t mat::rows() const noexcept { return num_rows; }
 inline size_t mat::cols() const noexcept { return num_cols; }
 
+/// Matrix is saved as A = (L - E_n) + U
+/// (under diagonal is L and remaining matrix is U)
+inline void lu_factors(mat& A, std::vector<size_t>& p) {
+  if (A.rows() != A.cols())
+    throw std::logic_error(
+        "Matrix in t8_mra::util::lr_factor is not a square matrix");
 
-inline void mat::lr_factors(mat& A, std::vector<size_t>& r) {
   const auto n = A.rows();
-  r.resize(n);
+  p.resize(n);
+
+  for (auto i = 0u; i < n; ++i) p[i] = i;
 
   for (auto j = 0u; j < n; j++) {
+    auto Aj_max = 0.0;
     auto piv = j;
-    auto Aj_max = std::abs(A(j, j));
 
-    for (auto p = j + 1; p < n; p++) {
-      auto Ap = std::abs(A(p, j));
+    for (auto k = j; k < n; k++) {
+      const auto Ap = std::abs(A(k, j));
 
       if (Ap > Aj_max) {
-        piv = p;
         Aj_max = Ap;
+        piv = k;
       }
     }
 
-    r[j] = piv;
-    if (piv != j)
+    if (piv != j) {
+      std::swap(p[piv], p[j]);
       for (auto k = 0u; k < n; k++) std::swap(A(piv, k), A(j, k));
+    }
 
     for (auto i = j + 1; i < n; i++) {
       A(i, j) /= A(j, j);
+
       for (auto k = j + 1; k < n; k++) A(i, k) -= A(i, j) * A(j, k);
     }
   }
