@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <stdexcept>
 #include <vector>
 
 namespace t8_mra::util {
@@ -14,36 +15,45 @@ class vec {
   std::vector<double> data;
 
  public:
-  vec(int n) : data(0) {
-    if (n > 0) data.resize(n, 0.0);
-  }
+  vec(size_t n) : data(n, 0.0) {}
 
   vec(const vec&) = default;
   vec& operator=(const vec&) = default;
   vec(vec&&) = default;
   vec& operator=(vec&&) = default;
 
-  double& operator()(int i) {
-    assert(i >= 0 && i < data.size());
+  double& operator()(size_t i) {
+    if (i >= data.size())
+      throw std::out_of_range(
+          "index in t8_mra::util::vec::operator() is out of range");
+
     return data[i];
   }
 
-  double operator()(int i) const {
-    assert(i >= 0 && i < data.size());
+  double operator()(size_t i) const {
+    if (i >= data.size())
+      throw std::out_of_range(
+          "index in t8_mra::util::vec::operator() is out of range");
+
     return data[i];
   }
 
   size_t size() const noexcept { return data.size(); }
 
   vec& operator+=(const vec& y) {
-    assert(y.size() >= data.size());
+    if (y.size() < data.size())
+      throw std::logic_error(
+          "lengths in t8_mra::util::vec::operator+= does not fit");
+
     for (auto i = 0u; i < data.size(); i++) data[i] += y(i);
 
     return *this;
   }
 
   vec& operator-=(const vec& y) {
-    assert(y.size() >= data.size());
+    if (y.size() < data.size())
+      throw std::logic_error(
+          "lengths in t8_mra::util::vec::operator+= does not fit");
     for (auto i = 0u; i < data.size(); i++) data[i] -= y(i);
 
     return *this;
@@ -62,9 +72,10 @@ class vec {
 };
 
 inline double inner(const vec& v1, const vec& v2) {
-  assert(v1.size() == v2.size());
-  auto res = 0.0;
+  if (v1.size() != v2.size())
+    throw std::logic_error("lengths in t8_mra::util::inner does not fit");
 
+  auto res = 0.0;
   for (int i = 0; i < v1.size(); i++) res += v1(i) * v2(i);
 
   return res;

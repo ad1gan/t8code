@@ -34,12 +34,18 @@ class mat {
 };
 
 inline double& mat::operator()(size_t i, size_t j) {
-  assert(i >= 0 && i < m && j >= 0 && j < n);
+  if (i >= m || j >= n)
+    throw std::out_of_range(
+        "indices in t8_mra::util::mat::operator() is out of range");
+
   return data[m * j + i];
 }
 
 inline double mat::operator()(size_t i, size_t j) const {
-  assert(i >= 0 && i < m && j >= 0 && j < n);
+  if (i >= m || j >= n)
+    throw std::out_of_range(
+        "indices in t8_mra::util::mat::operator() is out of range");
+
   return data[m * j + i];
 }
 
