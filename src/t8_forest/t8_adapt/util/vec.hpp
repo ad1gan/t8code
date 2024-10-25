@@ -76,7 +76,7 @@ inline double inner(const vec& v1, const vec& v2) {
     throw std::logic_error("lengths in t8_mra::util::inner does not fit");
 
   auto res = 0.0;
-  for (int i = 0; i < v1.size(); i++) res += v1(i) * v2(i);
+  for (auto i = 0u; i < v1.size(); i++) res += v1(i) * v2(i);
 
   return res;
 }

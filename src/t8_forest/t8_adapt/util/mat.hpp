@@ -77,7 +77,7 @@ inline void mat::lr_factors(mat& A, std::vector<size_t>& r) {
 
     r[j] = piv;
     if (piv != j)
-      for (auto k = 0; k < n; k++) std::swap(A(piv, k), A(j, k));
+      for (auto k = 0u; k < n; k++) std::swap(A(piv, k), A(j, k));
 
     for (auto i = j + 1; i < n; i++) {
       A(i, j) /= A(j, j);
