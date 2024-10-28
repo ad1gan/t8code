@@ -14,6 +14,13 @@ class mat {
   mat() = default;
   mat(size_t _rows, size_t _cols)
       : data(_rows * _cols, {}), num_rows(_rows), num_cols(_cols) {}
+  mat(size_t _rows, size_t _cols, std::initializer_list<double> l)
+      : data(l), num_rows(_rows), num_cols(_cols) {
+    if (l.size() != _rows * _cols)
+      throw std::out_of_range(
+          "number elements in t8_mra::util::mat does not fit to number columns "
+          "and number rows");
+  }
 
   mat(const mat&) = default;
   mat& operator=(const mat&) = default;
