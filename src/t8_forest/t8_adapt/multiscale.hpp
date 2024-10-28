@@ -4,8 +4,11 @@
 // #include <t8.h>
 
 #include <cstddef>
+#include <stdexcept>
 #include <t8_forest/t8_adapt/util/mat.hpp>
 #include <vector>
+
+#include "t8_eclass.h"
 
 namespace t8_mra {
 
@@ -33,12 +36,16 @@ struct t8_data_per_element {
   std::vector<double> u;  /// DG-coefficients
 };
 
-template <int D>
+template <t8_eclass shape>
 struct t8_multiscale {
   size_t polynomial_degree;
   size_t dof;
   size_t max_level;
 
+  static constexpr int get_dim();
+  static constexpr int DIM = get_dim();
+
+  /// TODO Maybe on stack with std::array -> check array size
   std::vector<t8_mra::util::mat> mask_coeffs;
   std::vector<t8_mra::util::mat> inv_mask_coeffs;
 
@@ -49,5 +56,22 @@ struct t8_multiscale {
         mask_coeffs({4, {dof, dof}}),
         inv_mask_coeffs({4, {3 * dof, dof}}) {}
 };
+
+template <t8_eclass shape>
+constexpr int t8_multiscale<shape>::get_dim() {
+  switch (shape) {
+    case T8_ECLASS_LINE:
+      return 1;
+    case T8_ECLASS_QUAD:
+      return 2;
+    case T8_ECLASS_TRIANGLE:
+      return 2;
+    case T8_ECLASS_HEX:
+      return 3;
+    default:
+      throw std::out_of_range(
+          "Element shape is not supported in t8_mra::t8_multiscale");
+  }
+}
 
 }  // namespace t8_mra
