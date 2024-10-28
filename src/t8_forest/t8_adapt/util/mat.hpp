@@ -29,10 +29,6 @@ class mat {
 
   size_t rows() const noexcept;
   size_t cols() const noexcept;
-
-  // LR-Decomposition
-  // void lr_factors(mat& A, std::vector<size_t>& r);
-  // void lr_solve(const mat& A, const std::vector<size_t>& r, vec& x);
 };
 
 inline double& mat::operator()(size_t i, size_t j) {
@@ -62,7 +58,8 @@ inline size_t mat::rows() const noexcept { return num_rows; }
 inline size_t mat::cols() const noexcept { return num_cols; }
 
 /// Matrix is saved as A = (L - E_n) + U
-/// (under diagonal is L and remaining matrix is U)
+/// below diagonal: L
+/// Remaining matrix: U
 inline void lu_factors(mat& A, std::vector<size_t>& p) {
   if (A.rows() != A.cols())
     throw std::logic_error(
@@ -99,11 +96,11 @@ inline void lu_factors(mat& A, std::vector<size_t>& p) {
   }
 }
 
-inline void lr_solve(const mat& A, const std::vector<size_t>& r, vec& x) {
+inline void lu_solve(const mat& A, const std::vector<size_t>& p, vec& x) {
   if (A.rows() != A.cols())
     throw std::logic_error(
         "Matrix in t8_mra::util::lr_solve is not a square matrix");
-  if (A.rows() != r.size())
+  if (A.rows() != p.size())
     throw std::logic_error(
         "Permutation vector in t8_mra::util::lr_solve does not fit");
   if (A.rows() != x.size())
@@ -112,15 +109,15 @@ inline void lr_solve(const mat& A, const std::vector<size_t>& r, vec& x) {
 
   const auto n = A.rows();
 
-  for (auto i = 0u; i < n; i++)
-    if (i != r[i]) std::swap(x(i), x(r[i]));
+  const auto b = x;
+  for (auto i = 0u; i < n; ++i) {
+    x(i) = b(p[i]);
+    for (auto k = 0u; k < i; ++k) x(i) -= A(i, k) * x(k);
+  }
 
-  for (auto i = 1u; i < n; i++)
-    for (auto j = 0u; j < i; j++) x(i) -= A(i, j) * x(j);
-
-  for (auto i = n - 1; i >= 0; i--) {
-    for (auto j = i + 1; j < n; j++) x(i) -= A(i, j) * x(j);
-
+  for (int i = n - 1; i >= 0; --i) {
+    for (auto k = static_cast<size_t>(i + 1); k < n; ++k)
+      x(i) -= A(i, k) * x(k);
     x(i) /= A(i, i);
   }
 }
