@@ -1,14 +1,13 @@
 /// Multiscale module
 ///
 
-// #include <t8.h>
+#include <t8_eclass.h>
 
 #include <cstddef>
 #include <stdexcept>
+#include <t8_forest/t8_adapt/t8_maskcoeff/mask_coefficients.hpp>
 #include <t8_forest/t8_adapt/util/mat.hpp>
 #include <vector>
-
-#include "t8_eclass.h"
 
 namespace t8_mra {
 
@@ -36,7 +35,7 @@ struct t8_data_per_element {
   std::vector<double> u;  /// DG-coefficients
 };
 
-template <t8_eclass Tshape>
+template <t8_eclass TShape>
 struct t8_multiscale {
   size_t polynomial_degree;
   size_t dof;
@@ -54,12 +53,15 @@ struct t8_multiscale {
         dof((_p * (_p + 1)) / 2),
         max_level(_max_level),
         mask_coeffs({4, {dof, dof}}),
-        inv_mask_coeffs({4, {3 * dof, dof}}) {}
+        inv_mask_coeffs({4, {3 * dof, dof}}) {
+    t8_mra::mask_coefficients::initialize<TShape>(polynomial_degree,
+                                                  mask_coeffs, inv_mask_coeffs);
+  }
 };
 
-template <t8_eclass Tshape>
-constexpr int t8_multiscale<Tshape>::get_dim() {
-  switch (Tshape) {
+template <t8_eclass TShape>
+constexpr int t8_multiscale<TShape>::get_dim() {
+  switch (TShape) {
     case T8_ECLASS_LINE:
       return 1;
     case T8_ECLASS_QUAD:
