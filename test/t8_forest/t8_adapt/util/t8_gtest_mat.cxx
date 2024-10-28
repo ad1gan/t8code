@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <t8_forest/t8_adapt/util/mat.hpp>
+#include <t8_forest/t8_adapt/util/vec.hpp>
 
 class t8_adapt_mat_test : public ::testing::Test {
   void SetUp() {}
@@ -63,7 +64,6 @@ TEST_F(t8_adapt_mat_test, lr_decomposition) {
   std::vector<size_t> pivot;
 
   /// Example from https://en.wikipedia.org/wiki/LU_decomposition#Example_2
-
   foo(0, 0) = 0.0;
   foo(1, 0) = 4.0;
   foo(2, 0) = 2.0;
@@ -76,17 +76,16 @@ TEST_F(t8_adapt_mat_test, lr_decomposition) {
   foo(1, 2) = 1.0;
   foo(2, 2) = 9.0;
 
-  for (auto i = 0u; i < foo.rows(); ++i) {
-    for (auto j = 0u; j < foo.cols(); ++j)
-      std::cout << std::setw(12) << foo(i, j);
-    std::cout << "\n";
-  }
-
   t8_mra::util::lu_factors(foo, pivot);
 
   ASSERT_EQ(pivot[0], 1u);
   ASSERT_EQ(pivot[1], 2u);
   ASSERT_EQ(pivot[2], 0u);
+
+  /// L Matrix
+  ASSERT_NEAR(foo(1, 0), 0.5, eps * 0.5);
+  ASSERT_NEAR(foo(2, 0), 0.0, 0.0);
+  ASSERT_NEAR(foo(2, 1), 5.0 / 6.0, eps * 5.0 / 6.0);
 
   /// U Matrix
   ASSERT_NEAR(foo(0, 0), 4.0, eps * 4.0);
@@ -96,17 +95,14 @@ TEST_F(t8_adapt_mat_test, lr_decomposition) {
   ASSERT_NEAR(foo(1, 2), 8.5, eps * 8.5);
   ASSERT_NEAR(foo(2, 2), 0.25, eps * 0.25);
 
-  /// L Matrix
-  ASSERT_NEAR(foo(1, 0), 0.5, eps * 0.5);
-  ASSERT_NEAR(foo(2, 0), 0.0, 0.0);
-  ASSERT_NEAR(foo(2, 1), 5.0 / 6.0, eps * 5.0 / 6.0);
+  t8_mra::util::vec x(3u);
+  x(0) = 2.0;
+  x(1) = 0.0;
+  x(2) = 1.0;
 
-  for (auto i = 0u; i < pivot.size(); ++i)
-    std::cout << "pivot: " << pivot[i] << "\n";
+  t8_mra::util::lu_solve(foo, pivot, x);
 
-  for (auto i = 0u; i < foo.rows(); ++i) {
-    for (auto j = 0u; j < foo.cols(); ++j)
-      std::cout << std::setw(12) << foo(i, j);
-    std::cout << "\n";
-  }
+  ASSERT_NEAR(x(0), 37.0 / 18.0, eps * 37.0 / 18.0);
+  ASSERT_NEAR(x(1), -58.0 / 9.0, eps * 58.0 / 9.0);
+  ASSERT_NEAR(x(2), 14.0 / 3.0, eps * 14.0 / 3.0);
 }
