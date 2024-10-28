@@ -36,7 +36,7 @@ struct t8_data_per_element {
   std::vector<double> u;  /// DG-coefficients
 };
 
-template <t8_eclass shape>
+template <t8_eclass Tshape>
 struct t8_multiscale {
   size_t polynomial_degree;
   size_t dof;
@@ -57,9 +57,9 @@ struct t8_multiscale {
         inv_mask_coeffs({4, {3 * dof, dof}}) {}
 };
 
-template <t8_eclass shape>
-constexpr int t8_multiscale<shape>::get_dim() {
-  switch (shape) {
+template <t8_eclass Tshape>
+constexpr int t8_multiscale<Tshape>::get_dim() {
+  switch (Tshape) {
     case T8_ECLASS_LINE:
       return 1;
     case T8_ECLASS_QUAD:
