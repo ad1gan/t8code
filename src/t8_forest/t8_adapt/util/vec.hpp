@@ -17,6 +17,7 @@ class vec {
  public:
   vec() = default;
   vec(size_t n) : data(n, 0.0) {}
+  vec(std::initializer_list<double> l) : data(l) {}
 
   vec(const vec&) = default;
   vec& operator=(const vec&) = default;
