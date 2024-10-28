@@ -28,9 +28,13 @@ TEST_F(t8_adapt_vec_test, cstr) {
 TEST_F(t8_adapt_vec_test, size) {
   t8_mra::util::vec foo1;
   t8_mra::util::vec foo2(n);
+  t8_mra::util::vec foo3({1.0, 2.0, 3.0});
+  t8_mra::util::vec foo4 = {1.0, 2.0, 3.0, 0.0};
 
   ASSERT_EQ(foo1.size(), 0u);
   ASSERT_EQ(foo2.size(), n);
+  ASSERT_EQ(foo3.size(), 3u);
+  ASSERT_EQ(foo4.size(), 4u);
 }
 
 TEST_F(t8_adapt_vec_test, resize) {
@@ -65,10 +69,7 @@ TEST_F(t8_adapt_vec_test, math_operator) {
 }
 
 TEST_F(t8_adapt_vec_test, norms) {
-  t8_mra::util::vec foo(3);
-  foo(0) = 2.0;
-  foo(1) = -3.0;
-  foo(2) = 7.0;
+  t8_mra::util::vec foo = {2.0, -3.0, 7.0};
 
   ASSERT_EQ(t8_mra::util::l1norm(foo), 12.0);
   ASSERT_EQ(t8_mra::util::l2norm(foo), std::sqrt(62));
@@ -76,15 +77,8 @@ TEST_F(t8_adapt_vec_test, norms) {
 }
 
 TEST_F(t8_adapt_vec_test, inner_product) {
-  t8_mra::util::vec foo(3);
-  foo(0) = 1.0;
-  foo(1) = -2.0;
-  foo(2) = 3.0;
-
-  t8_mra::util::vec bar(3);
-  bar(0) = -10.0;
-  bar(1) = 0.5;
-  bar(2) = 4.0;
+  t8_mra::util::vec foo = {1.0, -2.0, 3.0};
+  t8_mra::util::vec bar = {-10.0, 0.5, 4.0};
 
   ASSERT_EQ(t8_mra::util::inner(foo, bar), 1.0);
 }

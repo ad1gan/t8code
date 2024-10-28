@@ -95,10 +95,7 @@ TEST_F(t8_adapt_mat_test, lr_decomposition) {
   ASSERT_NEAR(foo(1, 2), 8.5, eps * 8.5);
   ASSERT_NEAR(foo(2, 2), 0.25, eps * 0.25);
 
-  t8_mra::util::vec x(3u);
-  x(0) = 2.0;
-  x(1) = 0.0;
-  x(2) = 1.0;
+  t8_mra::util::vec x = {2.0, 0.0, 1.0};
 
   t8_mra::util::lu_solve(foo, pivot, x);
 
