@@ -45,6 +45,14 @@ TEST_F(t8_adapt_vec_test, resize) {
   for (auto i = 0u; i < foo.size(); ++i) ASSERT_EQ(foo(i), 0.0);
 }
 
+TEST_F(t8_adapt_vec_test, init_list_assign) {
+  t8_mra::util::vec foo1({1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
+  t8_mra::util::vec foo2 = foo1;
+
+  foo2 *= -1;
+  for (auto i = 0u; i < foo1.size(); ++i) ASSERT_EQ(-foo1(i), foo2(i));
+}
+
 TEST_F(t8_adapt_vec_test, access_operator) {
   t8_mra::util::vec foo(n);
   for (auto i = 0u; i < foo.size(); ++i) foo(i) = i;

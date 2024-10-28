@@ -45,6 +45,15 @@ TEST_F(t8_adapt_mat_test, row_cols) {
   ASSERT_EQ(foo4.cols(), 2u);
 }
 
+TEST_F(t8_adapt_mat_test, init_list_assign) {
+  t8_mra::util::mat foo1(2, 3, {1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
+  t8_mra::util::mat foo2(2, 3, {1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
+
+  foo2 = {-1.0, -2.0, -3.0, -4.0, -5.0, -6.0};
+  for (auto i = 0u; i < foo1.rows(); ++i)
+    for (auto j = 0u; j < foo1.cols(); ++j) ASSERT_EQ(-foo1(i, j), foo2(i, j));
+}
+
 TEST_F(t8_adapt_mat_test, resize) {
   t8_mra::util::mat foo(m, n);
   foo.resize(10u, 20u);

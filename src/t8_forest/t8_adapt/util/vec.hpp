@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <stdexcept>
@@ -23,6 +24,17 @@ class vec {
   vec& operator=(const vec&) = default;
   vec(vec&&) = default;
   vec& operator=(vec&&) = default;
+
+  vec& operator=(const std::initializer_list<double>& l) {
+    if (l.size() != data.size())
+      throw std::out_of_range(
+          "number elements in t8_mra::util::vec does not fit to number columns "
+          "and number rows");
+
+    std::copy_n(l.begin(), l.size(), data.begin());
+
+    return *this;
+  }
 
   double& operator()(size_t i) {
     if (i >= data.size())

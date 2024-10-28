@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <t8_forest/t8_adapt/util/vec.hpp>
 #include <vector>
 
@@ -14,6 +15,7 @@ class mat {
   mat() = default;
   mat(size_t _rows, size_t _cols)
       : data(_rows * _cols, {}), num_rows(_rows), num_cols(_cols) {}
+
   mat(size_t _rows, size_t _cols, std::initializer_list<double> l)
       : data(l), num_rows(_rows), num_cols(_cols) {
     if (l.size() != _rows * _cols)
@@ -26,6 +28,17 @@ class mat {
   mat& operator=(const mat&) = default;
   mat(mat&&) = default;
   mat& operator=(mat&&) = default;
+
+  mat& operator=(const std::initializer_list<double>& l) {
+    if (l.size() != num_rows * num_cols)
+      throw std::out_of_range(
+          "number elements in t8_mra::util::mat does not fit to number columns "
+          "and number rows");
+
+    std::copy_n(l.begin(), l.size(), data.begin());
+
+    return *this;
+  }
 
   double& operator()(size_t i, size_t j);
   double operator()(size_t i, size_t j) const;
