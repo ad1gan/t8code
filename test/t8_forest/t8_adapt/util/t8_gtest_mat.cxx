@@ -32,11 +32,17 @@ TEST_F(t8_adapt_mat_test, cstr) {
 TEST_F(t8_adapt_mat_test, row_cols) {
   t8_mra::util::mat foo1;
   t8_mra::util::mat foo2(m, n);
+  t8_mra::util::mat foo3(2, 3, {1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
+  t8_mra::util::mat foo4 = {3, 2, {1.0, 2.0, 3.0, 4.0, 5.0, 6.0}};
 
   ASSERT_EQ(foo1.rows(), 0u);
   ASSERT_EQ(foo1.cols(), 0u);
   ASSERT_EQ(foo2.rows(), m);
   ASSERT_EQ(foo2.cols(), n);
+  ASSERT_EQ(foo3.rows(), 2u);
+  ASSERT_EQ(foo3.cols(), 3u);
+  ASSERT_EQ(foo4.rows(), 3u);
+  ASSERT_EQ(foo4.cols(), 2u);
 }
 
 TEST_F(t8_adapt_mat_test, resize) {
@@ -47,7 +53,7 @@ TEST_F(t8_adapt_mat_test, resize) {
   ASSERT_EQ(foo.cols(), 20u);
 
   for (auto j = 0u; j < foo.cols(); ++j)
-    for (auto i = 0u; i < foo.rows(); ++i) foo(i, j) = 0.0;
+    for (auto i = 0u; i < foo.rows(); ++i) ASSERT_EQ(foo(i, j), 0.0);
 }
 
 TEST_F(t8_adapt_mat_test, access_operator) {
@@ -60,22 +66,10 @@ TEST_F(t8_adapt_mat_test, access_operator) {
 }
 
 TEST_F(t8_adapt_mat_test, lr_decomposition) {
-  t8_mra::util::mat foo(3u, 3u);
-  std::vector<size_t> pivot;
-
   /// Example from https://en.wikipedia.org/wiki/LU_decomposition#Example_2
-  foo(0, 0) = 0.0;
-  foo(1, 0) = 4.0;
-  foo(2, 0) = 2.0;
-
-  foo(0, 1) = 5.0;
-  foo(1, 1) = 2.0;
-  foo(2, 1) = 7.0;
-
-  foo(0, 2) = 22.0 / 3.0;
-  foo(1, 2) = 1.0;
-  foo(2, 2) = 9.0;
-
+  t8_mra::util::mat foo(3u, 3u,
+                        {0.0, 4.0, 2.0, 5.0, 2.0, 7.0, 22.0 / 3.0, 1.0, 9.0});
+  std::vector<size_t> pivot;
   t8_mra::util::lu_factors(foo, pivot);
 
   ASSERT_EQ(pivot[0], 1u);
