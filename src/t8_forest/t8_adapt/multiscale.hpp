@@ -9,6 +9,8 @@
 #include <t8_forest/t8_adapt/util/mat.hpp>
 #include <vector>
 
+#include "t8_element.h"
+
 namespace t8_mra {
 
 /**
@@ -53,14 +55,20 @@ struct t8_multiscale {
   size_t max_level;
 
   double c_thresh;
+
   static constexpr int get_dim();
   static constexpr int DIM = get_dim();
+
+  using lmi_t = levelmultiindex<DIM>;
 
   /// TODO Maybe on stack with std::array -> check array size
   std::vector<t8_mra::util::mat> mask_coeffs;
   std::vector<t8_mra::util::mat> inv_mask_coeffs;
 
-  t8_multiscale(size_t _p, size_t _max_level)
+  lmi_t t8_element_id_to_lmi(const t8_element_t* element,
+                             t8_eclass_scheme_c* eclass_scheme,
+                             t8_locidx_t element_id, size_t offset);
+
   t8_multiscale(size_t _p, double _c_thresh, size_t _max_level)
       : polynomial_degree(_p),
         dof((_p * (_p + 1)) / 2),
@@ -90,4 +98,18 @@ constexpr int t8_multiscale<TShape>::get_dim() {
   }
 }
 
+template <t8_eclass TShape>
+typename t8_multiscale<TShape>::lmi_t
+t8_multiscale<TShape>::t8_element_id_to_lmi(const t8_element_t* element,
+                                            t8_eclass_scheme_c* eclass_scheme,
+                                            t8_locidx_t element_id,
+                                            size_t offset) {
+  throw std::out_of_range(
+      "Element shape is not supported in "
+      "t8_mra::t8_multiscale::t8_element_id_to_lmi");
+
+  return {};
+}
+
 }  // namespace t8_mra
+
