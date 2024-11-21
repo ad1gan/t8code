@@ -113,3 +113,4 @@ t8_multiscale<TShape>::t8_element_id_to_lmi(const t8_element_t* element,
 
 }  // namespace t8_mra
 
+#include <t8_forest/t8_adapt/multiscale/t8_eclass_triangle.hpp>
