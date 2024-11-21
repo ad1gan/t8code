@@ -16,11 +16,22 @@ namespace t8_mra {
  *
  * Stores levelmultiindex of each cell. It describes the cell position of each
  * cell in the grid with respect to its refinenment level.
+ * lmi = [level, multiindex]
  *
  */
 template <int D>
 struct levelmultiindex {
-  size_t lmi[D + 1];
+  /// TODO Boundchecks
+  size_t arr[D + 1];
+
+  size_t& operator[](size_t idx) { return arr[idx]; }
+  const size_t& operator[](size_t idx) const { return arr[idx]; }
+
+  size_t& level() { return arr[0]; }
+  const size_t& level() const { return arr[0]; }
+
+  size_t& mi(size_t idx) { return arr[idx + 1]; }
+  const size_t& mi(size_t idx) const { return arr[idx + 1]; }
 };
 
 template <int D>
