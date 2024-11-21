@@ -52,6 +52,7 @@ struct t8_multiscale {
   size_t dof;
   size_t max_level;
 
+  double c_thresh;
   static constexpr int get_dim();
   static constexpr int DIM = get_dim();
 
@@ -60,9 +61,11 @@ struct t8_multiscale {
   std::vector<t8_mra::util::mat> inv_mask_coeffs;
 
   t8_multiscale(size_t _p, size_t _max_level)
+  t8_multiscale(size_t _p, double _c_thresh, size_t _max_level)
       : polynomial_degree(_p),
         dof((_p * (_p + 1)) / 2),
         max_level(_max_level),
+        c_thresh(_c_thresh),
         mask_coeffs({4, {dof, dof}}),
         inv_mask_coeffs({4, {3 * dof, dof}}) {
     t8_mra::mask_coefficients::initialize<TShape>(polynomial_degree,
