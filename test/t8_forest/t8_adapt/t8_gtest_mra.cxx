@@ -12,6 +12,10 @@ class t8_adapt_mra_test : public ::testing::Test {
   double c_thresh = 0.1;
 };
 
+/// TODO
+/// write tests for orhtogonal maskmatrices, mst -> imst -> mst, cancellation
+/// property, etc.
+
 TEST_F(t8_adapt_mra_test, cstr) {
   t8_mra::t8_multiscale<T8_ECLASS_TRIANGLE> mra(p, c_thresh, max_level);
   ASSERT_EQ(t8_mra::t8_multiscale<T8_ECLASS_TRIANGLE>::DIM, 2);
