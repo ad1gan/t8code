@@ -36,7 +36,7 @@ struct levelmultiindex {
 
 template <int D>
 struct children {
-  size_t child_arr[2 * D];
+  size_t arr[2 * D];
 };
 
 /// TODO How do we control that for each D,U,P combination?
