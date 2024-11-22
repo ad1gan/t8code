@@ -19,22 +19,29 @@ namespace t8_mra {
  *
  * Stores levelmultiindex of each cell. It describes the cell position of each
  * cell in the grid with respect to its refinenment level.
- * lmi = [level, multiindex]
+ * lmi = [path, level, base]
+ * level = refinement level of cell
+ * base = index of cmesh element that contains the lmi
+ * path = path to current element (e.g. base a, go to its third child and from
+ * there to its first child -> 02a)
+ * path ordering: from right to left, children are indexed from 0 to 3
  *
  */
+//! TODO For triangulation we have paths, but for quadliteral elements we do not
+// have this -> More general structur?
+
 template <int D>
 struct levelmultiindex {
-  /// TODO Boundchecks
   size_t arr[D + 1];
 
-  size_t& operator[](size_t idx) { return arr[idx]; }
-  const size_t& operator[](size_t idx) const { return arr[idx]; }
+  size_t& path() { return arr[0]; }
+  const size_t& path() const { return arr[0]; }
 
-  size_t& level() { return arr[0]; }
-  const size_t& level() const { return arr[0]; }
+  size_t& level() { return arr[1]; }
+  const size_t& level() const { return arr[1]; }
 
-  size_t& mi(size_t idx) { return arr[idx + 1]; }
-  const size_t& mi(size_t idx) const { return arr[idx + 1]; }
+  size_t& base() { return arr[2]; }
+  const size_t& base() const { return arr[2]; }
 };
 
 template <int D>
@@ -71,6 +78,7 @@ struct t8_multiscale {
                              t8_locidx_t element_id, size_t offset) const;
 
   t8_locidx_t t8_lmi_to_element_id(const lmi_t& lmi, size_t offset) const;
+
   t8_multiscale(size_t _p, double _c_thresh, size_t _max_level)
       : polynomial_degree(_p),
         dof((_p * (_p + 1)) / 2),
