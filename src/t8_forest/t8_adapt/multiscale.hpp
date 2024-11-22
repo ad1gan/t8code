@@ -114,6 +114,22 @@ struct t8_multiscale {
    */
   lmi_t get_jth_child(size_t j, const lmi_t& lmi, size_t offset) const;
 
+  /**
+   * @brief Get t8_code element_id for child of lmi
+   *
+   * @param j Which child
+   * @param element current t8_element
+   * @param eclass_scheme current t8_scheme
+   * @param element_id which elment
+   * @param offset [TODO:parameter]
+   * @return element_id of child
+   */
+  t8_locidx_t get_jth_child_of_t8_element_id(size_t j,
+                                             const t8_element_t* element,
+                                             t8_eclass_scheme_c* eclass_scheme,
+                                             t8_locidx_t element_id,
+                                             size_t offset) const;
+
   t8_multiscale(size_t _p, double _c_thresh, size_t _max_level)
       : polynomial_degree(_p),
         dof((_p * (_p + 1)) / 2),
@@ -182,6 +198,17 @@ typename t8_multiscale<TShape>::lmi_t t8_multiscale<TShape>::get_jth_child(
   throw std::out_of_range(
       "Element shape is not supported in "
       "t8_mra::t8_multiscale::t8_get_jth_child");
+
+  return {};
+}
+
+template <t8_eclass TShape>
+t8_locidx_t t8_multiscale<TShape>::get_jth_child_of_t8_element_id(
+    size_t j, const t8_element_t* element, t8_eclass_scheme_c* eclass_scheme,
+    t8_locidx_t element_id, size_t offset) const {
+  throw std::out_of_range(
+      "Element shape is not supported in "
+      "t8_mra::t8_multiscale::get_jth_child_of_t8_element_id");
 
   return {};
 }
