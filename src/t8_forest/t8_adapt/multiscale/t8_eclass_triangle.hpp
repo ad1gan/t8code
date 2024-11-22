@@ -62,4 +62,19 @@ t8_multiscale<T8_ECLASS_TRIANGLE>::get_parent_lmi(
   return parent;
 }
 
+template <>
+typename t8_multiscale<T8_ECLASS_TRIANGLE>::lmi_t
+t8_multiscale<T8_ECLASS_TRIANGLE>::get_jth_child(
+    size_t j, const t8_multiscale<T8_ECLASS_TRIANGLE>::lmi_t& lmi,
+    size_t offset) const {
+  lmi_t child;
+
+  child.level() = lmi.level() + 1;
+  child.base() = lmi.base();
+  /// Add j at front of path
+  child.path() = lmi.path() + j * std::pow(lmi.level() + 1 + offset, 10);
+
+  return child;
+}
+
 }  // namespace t8_mra
