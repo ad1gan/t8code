@@ -46,8 +46,7 @@ t8_locidx_t t8_multiscale<T8_ECLASS_TRIANGLE>::t8_lmi_to_element_id(
 template <>
 typename t8_multiscale<T8_ECLASS_TRIANGLE>::lmi_t
 t8_multiscale<T8_ECLASS_TRIANGLE>::get_parent_lmi(
-    const t8_multiscale<T8_ECLASS_TRIANGLE>::lmi_t& lmi,
-    size_t offset) const noexcept {
+    const t8_multiscale<T8_ECLASS_TRIANGLE>::lmi_t& lmi, size_t offset) const {
   lmi_t parent;
 
   parent.level() = static_cast<int>(lmi.level()) - 1;
