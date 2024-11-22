@@ -73,10 +73,26 @@ struct t8_multiscale {
   std::vector<t8_mra::util::mat> mask_coeffs;
   std::vector<t8_mra::util::mat> inv_mask_coeffs;
 
+  /**
+   * @brief Converts t8_code element_id to levelmultiindex
+   *
+   * @param element current element
+   * @param eclass_scheme [TODO:parameter]
+   * @param element_id current element_id
+   * @param offset [TODO:parameter]
+   * @return corresponding levelmultiindex
+   */
   lmi_t t8_element_id_to_lmi(const t8_element_t* element,
                              t8_eclass_scheme_c* eclass_scheme,
                              t8_locidx_t element_id, size_t offset) const;
 
+  /**
+   * @brief Converts levelmultiindex to t8_code element_id
+   *
+   * @param lmi levelmultiindex
+   * @param offset [TODO:parameter]
+   * @return corresponding element_id
+   */
   t8_locidx_t t8_lmi_to_element_id(const lmi_t& lmi, size_t offset) const;
 
   t8_multiscale(size_t _p, double _c_thresh, size_t _max_level)
