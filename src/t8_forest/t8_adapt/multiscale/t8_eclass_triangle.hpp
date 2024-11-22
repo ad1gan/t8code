@@ -43,4 +43,24 @@ t8_locidx_t t8_multiscale<T8_ECLASS_TRIANGLE>::t8_lmi_to_element_id(
   return element_id;
 }
 
+template <>
+typename t8_multiscale<T8_ECLASS_TRIANGLE>::lmi_t
+t8_multiscale<T8_ECLASS_TRIANGLE>::get_parent_lmi(
+    const t8_multiscale<T8_ECLASS_TRIANGLE>::lmi_t& lmi,
+    size_t offset) const noexcept {
+  lmi_t parent;
+
+  parent.level() = static_cast<int>(lmi.level()) - 1;
+  parent.base() = lmi.base();
+  /// Removes first digit of path
+  /// TODO Find better more elegant solution
+  parent.path() =
+      lmi.path() - (static_cast<size_t>(
+                        lmi.path() / std::pow(lmi.level() + offset + 1, 10)) %
+                    10) *
+                       std::pow(offset + lmi.level() + 1, 10);
+
+  return parent;
+}
+
 }  // namespace t8_mra

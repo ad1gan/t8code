@@ -95,6 +95,8 @@ struct t8_multiscale {
    */
   t8_locidx_t t8_lmi_to_element_id(const lmi_t& lmi, size_t offset) const;
 
+  lmi_t get_parent_lmi(const lmi_t& lmi, size_t offset) const noexcept;
+
   t8_multiscale(size_t _p, double _c_thresh, size_t _max_level)
       : polynomial_degree(_p),
         dof((_p * (_p + 1)) / 2),
@@ -143,6 +145,16 @@ t8_locidx_t t8_multiscale<TShape>::t8_lmi_to_element_id(
   throw std::out_of_range(
       "Element shape is not supported in "
       "t8_mra::t8_multiscale::t8_lmi_to_element_id");
+
+  return {};
+}
+
+template <t8_eclass TShape>
+typename t8_multiscale<TShape>::lmi_t t8_multiscale<TShape>::get_parent_lmi(
+    const t8_multiscale<TShape>::lmi_t& lmi, size_t offset) const noexcept {
+  throw std::out_of_range(
+      "Element shape is not supported in "
+      "t8_mra::t8_multiscale::t8_get_parent");
 
   return {};
 }
