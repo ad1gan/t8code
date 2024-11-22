@@ -27,4 +27,19 @@ t8_multiscale<T8_ECLASS_TRIANGLE>::t8_element_id_to_lmi(
   return lmi;
 }
 
+template <>
+t8_locidx_t t8_multiscale<T8_ECLASS_TRIANGLE>::t8_lmi_to_element_id(
+    const t8_multiscale<T8_ECLASS_TRIANGLE>::lmi_t& lmi, size_t offset) const {
+  const auto level = static_cast<int>(lmi.level());
+  const auto path = lmi.path();
+  auto element_id = std::pow(level, lmi.base());
+
+  for (auto l = 0; l < level; ++l)
+    element_id +=
+        std::pow(l, 4) *
+        (static_cast<size_t>(path / std::pow(level + offset - l, 10)) % 10);
+
+  return element_id;
+}
+
 }  // namespace t8_mra
