@@ -88,4 +88,15 @@ t8_locidx_t t8_multiscale<T8_ECLASS_TRIANGLE>::get_jth_child_of_t8_element_id(
   return t8_lmi_to_element_id(child, offset);
 }
 
+template <>
+t8_locidx_t t8_multiscale<T8_ECLASS_TRIANGLE>::get_parent_of_t8_element_id(
+    const t8_element_t* element, t8_eclass_scheme_c* eclass_scheme,
+    t8_locidx_t element_id, size_t offset) const {
+  const auto lmi =
+      t8_element_id_to_lmi(element, eclass_scheme, element_id, offset);
+  const auto parent = get_parent_lmi(lmi, offset);
+
+  return t8_lmi_to_element_id(parent, offset);
+}
+
 }  // namespace t8_mra

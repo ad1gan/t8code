@@ -105,6 +105,19 @@ struct t8_multiscale {
   lmi_t get_parent_lmi(const lmi_t& lmi, size_t offset) const;
 
   /**
+   * @brief Get element_id of parent of the current lmi
+   *
+   * @param element Current element
+   * @param eclass_scheme Current scheme
+   * @param element_id Which element
+   * @param offset [TODO:parameter]
+   * @return element_id of parent
+   */
+  t8_locidx_t get_parent_of_t8_element_id(const t8_element_t* element,
+                                          t8_eclass_scheme_c* eclass_scheme,
+                                          t8_locidx_t element_id,
+                                          size_t offset) const;
+  /**
    * @brief Get jth child of current lmi
    *
    * @param j Which child
@@ -115,12 +128,12 @@ struct t8_multiscale {
   lmi_t get_jth_child(size_t j, const lmi_t& lmi, size_t offset) const;
 
   /**
-   * @brief Get t8_code element_id for child of lmi
+   * @brief Get element_id of child of the current lmi
    *
    * @param j Which child
-   * @param element current t8_element
-   * @param eclass_scheme current t8_scheme
-   * @param element_id which elment
+   * @param element Current element
+   * @param eclass_scheme Current scheme
+   * @param element_id Which element
    * @param offset [TODO:parameter]
    * @return element_id of child
    */
@@ -209,6 +222,17 @@ t8_locidx_t t8_multiscale<TShape>::get_jth_child_of_t8_element_id(
   throw std::out_of_range(
       "Element shape is not supported in "
       "t8_mra::t8_multiscale::get_jth_child_of_t8_element_id");
+
+  return {};
+}
+
+template <t8_eclass TShape>
+t8_locidx_t t8_multiscale<TShape>::get_parent_of_t8_element_id(
+    const t8_element_t* element, t8_eclass_scheme_c* eclass_scheme,
+    t8_locidx_t element_id, size_t offset) const {
+  throw std::out_of_range(
+      "Element shape is not supported in "
+      "t8_mra::t8_multiscale::get_parent_of_t8_element_id");
 
   return {};
 }
