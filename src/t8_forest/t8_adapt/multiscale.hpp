@@ -11,6 +11,7 @@
 
 #include "t8.h"
 #include "t8_element.h"
+#include "t8_schemes/t8_default/t8_default_tri/t8_dtri.h"
 
 namespace t8_mra {
 
@@ -50,10 +51,19 @@ struct children {
 };
 
 /// TODO How do we control that for each D,U,P combination?
+template <int D>
 struct t8_data_per_element {
   int level;              /// Current refinement level
-  double volumen;         /// Cell volume
+  double volume;          /// Cell volume
   std::vector<double> u;  /// DG-coefficients
+  std::vector<double> d;  /// Detail coefficients
+
+  bool adapted;            /// Is element adapted
+  bool significant;        /// Is element significant
+  t8_locidx_t father_id;   /// t8_idx of father cell
+  levelmultiindex<D> lmi;  /// levelmultiindex of cell
+  children<D> child_ids;   /// t8_idx of all children
+  t8_dtri_type_t type_id;  /// What type of triangle (needed for SFC)
 };
 
 template <t8_eclass TShape>
