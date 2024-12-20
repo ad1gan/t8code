@@ -11,6 +11,7 @@
 
 #include "t8.h"
 #include "t8_element.h"
+#include "t8_forest/t8_forest_general.h"
 #include "t8_schemes/t8_default/t8_default_tri/t8_dtri.h"
 
 namespace t8_mra {
@@ -64,6 +65,29 @@ struct t8_data_per_element {
   levelmultiindex<D> lmi;  /// levelmultiindex of cell
   children<D> child_ids;   /// t8_idx of all children
   t8_dtri_type_t type_id;  /// What type of triangle (needed for SFC)
+};
+
+template <int D>
+struct grid_hierarchy {
+  struct grid_level {
+    t8_forest_t forest_arr;
+    t8_data_per_element<D>* data_arr;
+  };
+
+  std::vector<grid_level> grid_arr;
+
+  grid_hierarchy(size_t max_level) : grid_arr(max_level + 1) {}
+
+  template <typename Tf>
+  grid_hierarchy(t8_cmesh_t cmesh, t8_scheme_cxx_t* scheme, Tf F,
+                 size_t max_level, int rule, sc_MPI_Comm comm)
+      : grid_arr(max_level + 1) {
+    for (auto l = 0u; l < max_level + 1; ++l) {
+      grid_arr[l].forest_arr = t8_forest_new_uniform(cmesh, scheme, l, 0, comm);
+      grid_arr[l].data_arr =
+          t8_creat_element_data(grid_arr[l].forest_arr, F, rule, max_level);
+    }
+  }
 };
 
 template <t8_eclass TShape>
