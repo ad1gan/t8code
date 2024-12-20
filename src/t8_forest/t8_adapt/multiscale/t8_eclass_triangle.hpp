@@ -9,7 +9,7 @@ typename t8_multiscale<T8_ECLASS_TRIANGLE>::lmi_t
 t8_multiscale<T8_ECLASS_TRIANGLE>::t8_element_id_to_lmi(
     const t8_element_t* element, t8_eclass_scheme_c* eclass_scheme,
     t8_locidx_t element_id, size_t offset) const {
-  levelmultiindex<DIM> lmi;
+  levelmultiindex<DIM> lmi;  /// TODO lmi_t
 
   lmi.level() = eclass_scheme->t8_element_level(element);
   lmi.base() = element_id / std::pow(lmi.level(), 4u);
@@ -71,6 +71,7 @@ t8_multiscale<T8_ECLASS_TRIANGLE>::get_jth_child(
 
   child.level() = lmi.level() + 1;
   child.base() = lmi.base();
+
   /// Add j at front of path
   child.path() = lmi.path() + j * std::pow(lmi.level() + 1 + offset, 10u);
 
