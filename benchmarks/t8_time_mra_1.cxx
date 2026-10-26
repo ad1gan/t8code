@@ -186,7 +186,7 @@ example_hex_3d_bottom_up (int n_blocks_per_dir)
     root_out() << "Refine Version Iterator: " << i << "\n";
 
     /// Increase cmesh ref counter to avoid destruction
-    t8_cmesh_ref(cmesh);
+    if(i<2) t8_cmesh_ref(cmesh);
 
     // Set up MRA instance.
     t8_mra::multiscale<T8_ECLASS_HEX, U, P> mra (max_level, sc_MPI_COMM_WORLD);
@@ -253,19 +253,8 @@ t8_no_mra_adapt_callback ([[maybe_unused]] t8_forest_t forest,  [[maybe_unused]]
   t8_forest_element_centroid (forest_from, which_tree, elements[0], centroid.data());
   double fun_eval = t8_dist(centroid, t8_3D_vec{0.5, 0.5, 0.5});
 
-  // const int max_level = 6;
-  // const int min_level = 1;
-
-  // int fun_level = static_cast<int>( std::round(2.5/fun_eval));
-  // int target_level = std::max(min_level, std::min(max_level, fun_level));
-
-  // int target_level = static_cast<int>( std::round(  (1.0 - (fun_eval / std::sqrt(2.0))) * (max_level-min_level) +  min_level) );
-
-  // if(target_level%2==1) target_level--;
-
   int level = scheme->element_get_level(tree_class, elements[0]);
 
-  // if(dist < target_level) return 1;
   if( is_family and level > 1 and fun_eval > 0.5) return -1;
   return 0;
 }
@@ -285,9 +274,6 @@ example_hex_3d_no_mra (int n_blocks_per_dir)
   const int n_y = n_x;
   const int n_z = n_x;
   const int num_global_trees = n_x * n_y * n_z;
-
-
-
   const int start_level = 6;
 
   // Define mesh and scheme.
