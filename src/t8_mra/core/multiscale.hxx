@@ -252,8 +252,9 @@ class multiscale {
     sc_MPI_Allreduce (local.data (), global.data (), U_DIM, sc_MPI_DOUBLE, sc_MPI_MAX, grid.comm);
 
     for (auto u = 0u; u < U_DIM; ++u)
-      if (global[u] < AMPLITUDE_EPS)
-        global[u] = 1.0;
+      // THOMAS HARD-CODED
+      // if (global[u] < AMPLITUDE_EPS)
+      global[u] = 1.0;
 
     return global;
   }

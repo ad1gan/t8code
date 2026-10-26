@@ -50,6 +50,10 @@ struct harten_prediction
   double c_thresh = 1.0;
   /// Expected order of convergence (enters the level-dependent threshold)
   int gamma = 1;
+  /// Switch off grading
+  bool switch_off_grading = false;
+  /// Switch off grading
+  bool switch_off_refining = false;
 
   template <typename TMultiscale>
   void
@@ -67,6 +71,8 @@ struct harten_prediction
     const auto threshold = c_thresh * mra.local_threshold_value (detail, lmi.level (), gamma);
     constexpr auto steep_factor = static_cast<double> (1u << (TMultiscale::P_DIM + 1));
 
+    if(switch_off_grading) return { false, norm > steep_factor * threshold };
+    if(switch_off_refining) return { norm > threshold, false };
     return { norm > threshold, norm > steep_factor * threshold };
   }
 };
