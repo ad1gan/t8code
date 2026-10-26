@@ -388,35 +388,19 @@ main (int argc, char **argv)
   if (!std::filesystem::exists ("mra_output"))
     t8_errorf ("Could not create directory");
 
-  // Example 1: Full adaptation cycle (top-down): initialize -> coarsen -> refine -> coarsen.
-  // example_adaptation_cycle ();
 
-  // // Example 2: Bottom-up initialization: adaptive grid without building the uniform grid.
-  // example_bottom_up ();
-
-  // // Example 3: Custom adaptation criteria.
-  // example_custom_criterion ();
-
-  // // Example 4: Triangle vs quad comparison on the same data.
-  // example_triangle_vs_quad ();
-
-  // // Example 5: 3D (hex) adaptation.
-  // root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-  // root_out() << "++++++++++++++++ TEST 1: MRA with uniform initialization ++++++++++++++++++++\n";
-  // root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-  // example_hex_3d (num_blocks_per_direction);
-  // root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-  // root_out() << "++++++++++++++++ TEST 2: MRA with adaptive initialization +++++++++++++++++++\n";
-  // root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-  // example_hex_3d_bottom_up (num_blocks_per_direction);
+  root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+  root_out() << "++++++++++++++++ TEST 1: MRA with uniform initialization ++++++++++++++++++++\n";
+  root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+  example_hex_3d (num_blocks_per_direction);
+  root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+  root_out() << "++++++++++++++++ TEST 2: MRA with adaptive initialization +++++++++++++++++++\n";
+  root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+  example_hex_3d_bottom_up (num_blocks_per_direction);
   root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
   root_out() << "+++++++++++++++++++++++++++++++ TEST 3: No MRA ++++++++++++++++++++++++++++++\n";
   root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
   example_hex_3d_no_mra (num_blocks_per_direction);
-
-  // // Example 6: Two state variables (U = 2) with different jump locations.
-  // example_two_components ();
-
   // Log output.
   root_out () << "\nAll examples completed. Output in mra_output/ (open in ParaView).\n";
 
