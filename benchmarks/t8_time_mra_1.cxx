@@ -33,7 +33,7 @@
 #endif
 
 // To switch between different paramter sets (coarser, finer, etc.)
-#define PARAMETER_SET 2
+#define PARAMETER_SET 3
 
 // Lazy include to outsource helper functions
 #include "helpers.cxx"
@@ -274,7 +274,14 @@ example_hex_3d_no_mra (int n_blocks_per_dir)
   const int n_y = n_x;
   const int n_z = n_x;
   const int num_global_trees = n_x * n_y * n_z;
-  const int start_level = 6;
+
+#if PARAMETER_SET == 1
+ const int start_level = 5;
+#elif PARAMETER_SET == 2
+ const int start_level = 6;
+#elif PARAMETER_SET == 3
+ const int start_level = 7;
+#endif
 
   // Define mesh and scheme.
   const t8_gloidx_t local_tree_offset = 0;
