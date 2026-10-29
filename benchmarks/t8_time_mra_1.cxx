@@ -33,7 +33,7 @@
 #endif
 
 // To switch between different paramter sets (coarser, finer, etc.)
-#define PARAMETER_SET 3
+#define PARAMETER_SET 2
 
 // Lazy include to outsource helper functions
 #include "helpers.cxx"
@@ -80,12 +80,12 @@ example_hex_3d (int n_blocks_per_dir)
 #endif
 
   // Set up MRA instance.
-  t8_mra::multiscale<T8_ECLASS_HEX, U, P> mra (max_level, sc_MPI_COMM_WORLD);
+  t8_mra::multiscale<T8_ECLASS_HEX, U, P> mra (max_level, sc_MPI_COMM_SELF);
 
   // Define mesh and scheme.
   const t8_gloidx_t local_tree_offset = 0;
   const double boundary_coords[24] = { 0, 0, 0, n_x, 0, 0, 0, n_y, 0, n_x, n_y, 0, 0, 0, n_z, n_x, 0, n_z, 0, n_y, n_z, n_x, n_y, n_z };
-  t8_cmesh_t cmesh = t8_cmesh_new_hypercube_pad_ext (T8_ECLASS_HEX, sc_MPI_COMM_WORLD, boundary_coords, n_x, n_y,
+  t8_cmesh_t cmesh = t8_cmesh_new_hypercube_pad_ext (T8_ECLASS_HEX, sc_MPI_COMM_SELF, boundary_coords, n_x, n_y,
                                                      n_z, 0, 0, 0, false, false, local_tree_offset);
   auto *scheme = t8_scheme_new_default ();
 
@@ -173,7 +173,7 @@ example_hex_3d_bottom_up (int n_blocks_per_dir)
   const t8_gloidx_t local_tree_offset = 0;
   const double boundary_coords[24] = { 0, 0, 0, n_x, 0, 0, 0, n_y, 0, n_x, n_y, 0, 0, 0, n_z, n_x, 0, n_z, 0, n_y, n_z, n_x, n_y, n_z };
 
-  t8_cmesh_t cmesh = t8_cmesh_new_hypercube_pad_ext (T8_ECLASS_HEX, sc_MPI_COMM_WORLD, boundary_coords, n_x, n_y,
+  t8_cmesh_t cmesh = t8_cmesh_new_hypercube_pad_ext (T8_ECLASS_HEX, sc_MPI_COMM_SELF, boundary_coords, n_x, n_y,
                                                      n_z, 0, 0, 0, false, false, local_tree_offset);
   // vtk output of cmesh
   if (vtk_activated)
@@ -189,7 +189,7 @@ example_hex_3d_bottom_up (int n_blocks_per_dir)
     if(i<2) t8_cmesh_ref(cmesh);
 
     // Set up MRA instance.
-    t8_mra::multiscale<T8_ECLASS_HEX, U, P> mra (max_level, sc_MPI_COMM_WORLD);
+    t8_mra::multiscale<T8_ECLASS_HEX, U, P> mra (max_level, sc_MPI_COMM_SELF);
 
     // Step 0; Initialize the MRA grid on maximum level.
     timing_start (fi, snapshot);
@@ -288,7 +288,7 @@ example_hex_3d_no_mra (int n_blocks_per_dir)
   const double boundary_coords[24] = { 0, 0, 0, n_x, 0, 0, 0, n_y, 0, n_x, n_y, 0, 0, 0, n_z, n_x, 0, n_z, 0, n_y, n_z, n_x, n_y, n_z };
 
   // Set cmesh and scheme
-  t8_cmesh_t cmesh = t8_cmesh_new_hypercube_pad_ext (T8_ECLASS_HEX, sc_MPI_COMM_WORLD, boundary_coords, n_x, n_y,
+  t8_cmesh_t cmesh = t8_cmesh_new_hypercube_pad_ext (T8_ECLASS_HEX, sc_MPI_COMM_SELF, boundary_coords, n_x, n_y,
                                                      n_z, 0, 0, 0, false, false, local_tree_offset);
 
   auto *scheme = t8_scheme_new_default ();
@@ -302,7 +302,7 @@ example_hex_3d_no_mra (int n_blocks_per_dir)
 
   // Step 0; Initialize the MRA grid on maximum level.
   timing_start (fi, snapshot);
-  t8_forest_t uniform_forest = t8_forest_new_uniform(cmesh, scheme, start_level, 1, sc_MPI_COMM_WORLD);
+  t8_forest_t uniform_forest = t8_forest_new_uniform(cmesh, scheme, start_level, 1, sc_MPI_COMM_SELF);
   timing_end ("New_Uniform", fi, snapshot, &(stats[0]));
   if (vtk_activated) t8_forest_write_vtk(uniform_forest, "no_mra_output/uniform_forest");
 
@@ -364,7 +364,7 @@ main (int argc, char **argv)
   // Initialize SC library for MPI handling.
   int mpiret = sc_MPI_Init (&argc, &argv);
   SC_CHECK_MPI (mpiret);
-  sc_init (sc_MPI_COMM_WORLD, 1, 1, nullptr, SC_LP_ESSENTIAL);
+  sc_init (sc_MPI_COMM_SELF, 1, 1, nullptr, SC_LP_ESSENTIAL);
 
   // Initialize t8code.
   t8_init (SC_LP_ESSENTIAL);
@@ -373,29 +373,38 @@ main (int argc, char **argv)
   int num_blocks_per_direction = std::atoi(argv[1]);
 
   // Rank 0 creates the output directory; everyone writes into it
-  int mpirank;
-  sc_MPI_Comm_rank (sc_MPI_COMM_WORLD, &mpirank);
+  int mpirank, mpisize;
+  sc_MPI_Comm_rank (sc_MPI_COMM_SELF, &mpirank);
+  sc_MPI_Comm_size (sc_MPI_COMM_SELF, &mpisize);
   if (mpirank == 0)
     std::filesystem::create_directory ("mra_output");
-  sc_MPI_Barrier (sc_MPI_COMM_WORLD);
+  sc_MPI_Barrier (sc_MPI_COMM_SELF);
   if (!std::filesystem::exists ("mra_output"))
     t8_errorf ("Could not create directory");
 
 
+  sc_MPI_Barrier (sc_MPI_COMM_WORLD);
+  std::cout << "Hi, I am rank " << mpirank << " of " << mpisize << std::endl;
+
+  sc_MPI_Barrier (sc_MPI_COMM_WORLD);
   root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
   root_out() << "++++++++++++++++ TEST 1: MRA with uniform initialization ++++++++++++++++++++\n";
   root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
   example_hex_3d (num_blocks_per_direction);
+  sc_MPI_Barrier (sc_MPI_COMM_WORLD);
   root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
   root_out() << "++++++++++++++++ TEST 2: MRA with adaptive initialization +++++++++++++++++++\n";
   root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
   example_hex_3d_bottom_up (num_blocks_per_direction);
+  sc_MPI_Barrier (sc_MPI_COMM_WORLD);
   root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
   root_out() << "+++++++++++++++++++++++++++++++ TEST 3: No MRA ++++++++++++++++++++++++++++++\n";
   root_out() << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
   example_hex_3d_no_mra (num_blocks_per_direction);
   // Log output.
   root_out () << "\nAll examples completed. Output in mra_output/ (open in ParaView).\n";
+
+  sc_MPI_Barrier (sc_MPI_COMM_WORLD);
 
   // Finalize SC library.
   sc_finalize ();

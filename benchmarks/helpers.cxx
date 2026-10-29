@@ -67,7 +67,7 @@ static root_ostream
 root_out ()
 {
   int rank;
-  sc_MPI_Comm_rank (sc_MPI_COMM_WORLD, &rank);
+  sc_MPI_Comm_rank (sc_MPI_COMM_SELF, &rank);
   return { rank == 0 };
 }
 
@@ -210,7 +210,7 @@ print_grid_stats (MRA &mra, const std::string &label)
               << " DOF\n";
   // const auto num_local_elements = t8_forest_get_local_num_leaf_elements (mra.get_forest ());
   // int rank;
-  // sc_MPI_Comm_rank (sc_MPI_COMM_WORLD, &rank);
+  // sc_MPI_Comm_rank (sc_MPI_COMM_SELF, &rank);
   // std::cout << "Process " << rank << " has " << num_local_elements << " local elements" << std::endl;
   return num_elements;
 }
