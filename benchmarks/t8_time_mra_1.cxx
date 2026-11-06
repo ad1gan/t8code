@@ -33,7 +33,7 @@
 #endif
 
 // To switch between different paramter sets (coarser, finer, etc.)
-#define PARAMETER_SET 3
+#define PARAMETER_SET 2
 
 // Lazy include to outsource helper functions
 #include "helpers.cxx"
@@ -264,6 +264,70 @@ t8_no_mra_adapt_callback ([[maybe_unused]] t8_forest_t forest,  [[maybe_unused]]
 // Test 3: Hex (3D), no-MRA version
 //=============================================================================
 
+struct no_mra_data_per_element_t
+{
+  std::array<double, 1 * 9> u_coeffs = {};
+  double volume;
+};
+
+struct no_mra_forest_data_t
+{
+  std::vector<no_mra_data_per_element_t> element_data;
+};
+
+
+/** Replace callback to decide how to interpolate a refined or coarsened element.
+ * If an element is refined, each child gets the value of its parent.
+ * If elements are coarsened, the parent gets the average value of the children.
+ * Outgoing are the old elements and incoming the new ones.
+ * \param [in] forest_old        non adapted forest
+ * \param [in, out] forest_new   adapted forest with interpolated user data for element(s)
+ * \param [in] which_tree        tree_id of the analyzed element
+ * \param [in] tree_class        The eclass of the tree 
+ * \param [in] scheme            Scheme of the forest
+ * \param [in] refine            ==0 - do nothing, == -1 - coarsen, == 1 - refine
+ * \param [in] num_outgoing      number of the elements not refined forest
+ * \param [in] first_outgoing    index of the old element
+ * \param [in] num_incoming      number of the elements corresponding to the element of the not refined forest
+ * \param [in] first_incoming    index of the new element
+ */
+void
+t8_forest_replace (t8_forest_t forest_old, t8_forest_t forest_new, t8_locidx_t which_tree,
+                   [[maybe_unused]] const t8_eclass_t tree_class, [[maybe_unused]] const t8_scheme *scheme, int refine,
+                   int num_outgoing, t8_locidx_t first_outgoing, int num_incoming, t8_locidx_t first_incoming)
+{
+  no_mra_forest_data_t *adapt_data_new = (no_mra_forest_data_t *) t8_forest_get_user_data (forest_new);
+  const no_mra_forest_data_t *adapt_data_old
+    = (const no_mra_forest_data_t *) t8_forest_get_user_data (forest_old);
+
+
+  /* get the index of the data array corresponding to the old and the adapted forest */
+  first_incoming += t8_forest_get_tree_element_offset (forest_new, which_tree);
+  first_outgoing += t8_forest_get_tree_element_offset (forest_old, which_tree);
+
+  /* Do not adapt or coarsen */
+  if (refine == 0) {
+    adapt_data_new->element_data[first_incoming] = adapt_data_old->element_data[first_outgoing];
+  }
+  /* The old element is refined, we copy the element values */
+  else if (refine == 1) {
+    for (int i = 0; i < num_incoming; i++) {
+      adapt_data_new->element_data[first_incoming + i] = adapt_data_old->element_data[first_outgoing];
+    }
+  }
+  /* Old element is coarsened */
+  else if (refine == -1) {
+    double dummy_value = 0;
+    for (t8_locidx_t i = 0; i < num_outgoing; i++) {
+      dummy_value += 1.0;
+    }
+    adapt_data_new->element_data[first_incoming] = adapt_data_old->element_data[first_outgoing];
+    // t8_element_set_value (adapt_data_new, first_incoming, tmp_value / num_outgoing);
+  }
+  t8_forest_set_user_data (forest_new, adapt_data_new);
+}
+
+
 void
 example_hex_3d_no_mra (int n_blocks_per_dir)
 {
@@ -297,8 +361,9 @@ example_hex_3d_no_mra (int n_blocks_per_dir)
 
   // Prepare profiling
   sc_flopinfo_t fi, snapshot;
-  int const num_stats = 3;
+  int const num_stats = 4;
   sc_statinfo_t stats[num_stats];
+
 
   // Step 0; Initialize the MRA grid on maximum level.
   timing_start (fi, snapshot);
@@ -308,21 +373,62 @@ example_hex_3d_no_mra (int n_blocks_per_dir)
 
   root_out () << "Uniform forest on level " << start_level << ":    " << t8_forest_get_global_num_leaf_elements(uniform_forest) << " elements\n";
 
-  // Step 1: Adapt the grid.
-  timing_start (fi, snapshot);
-  t8_forest_t adapted_forest = t8_forest_new_adapt(uniform_forest, t8_no_mra_adapt_callback, 1, 1, nullptr );
-  timing_end ("Adapt", fi, snapshot, &(stats[1]));
 
-  root_out () << "Adapted forest:    " << t8_forest_get_global_num_leaf_elements(adapted_forest)  << " elements\n";
-  if (vtk_activated) t8_forest_write_vtk(adapted_forest, "no_mra_output/adapted_forest");
+  t8_forest_t forest_from = uniform_forest;
+  t8_forest_t forest_out;
+  int num_repeat = 3;
+  for(int irepeat = 0; irepeat < num_repeat; irepeat++)
+  {
+
+    root_out () << "Iteration: " << irepeat << "\n";
+
+    t8_forest_ref (forest_from);
+
+    // Step 1: Adapt the grid.
+    timing_start (fi, snapshot);
+    t8_forest_t adapted_forest = t8_forest_new_adapt(forest_from, t8_no_mra_adapt_callback, false, true, nullptr );
+    timing_end ("Adapt", fi, snapshot, &(stats[1]));
+
+    root_out () << "Adapted forest:    " << t8_forest_get_global_num_leaf_elements(adapted_forest)  << " elements\n";
+
+
+    // Element data
+    no_mra_forest_data_t adapt_data;
+    no_mra_forest_data_t from_data;
+    int num_elems = t8_forest_get_local_num_leaf_elements(forest_from) + t8_forest_get_num_ghosts (forest_from);
+    from_data.element_data.resize(num_elems);
+    t8_forest_set_user_data (forest_from, &from_data);
+    num_elems = t8_forest_get_local_num_leaf_elements(adapted_forest) + t8_forest_get_num_ghosts (adapted_forest);
+    adapt_data.element_data.resize(num_elems);
+    t8_forest_set_user_data (adapted_forest, &adapt_data);
+
+    root_out () << "Start iterate-replace" << "\n"; 
+
+    // Step 1b: Iterate-replace
+    timing_start (fi, snapshot);
+    t8_forest_iterate_replace (adapted_forest, forest_from, t8_forest_replace);
+    timing_end ("Iterate_Replace", fi, snapshot, &(stats[2]));
+
+    root_out () << "End iterate-replace" << "\n"; 
+
+    t8_forest_unref (&forest_from);
+
+    //
+    forest_from = adapted_forest;
+    forest_out = adapted_forest;
+
+  }
+
+  if (vtk_activated) t8_forest_write_vtk(forest_out, "no_mra_output/adapted_forest");
+
 
   // Step 2: Balance
   t8_forest_t balanced_forest;
   t8_forest_init(&balanced_forest);
-  t8_forest_set_balance (balanced_forest, adapted_forest, 0);
+  t8_forest_set_balance (balanced_forest, forest_out, 0);
   timing_start (fi, snapshot);
   t8_forest_commit(balanced_forest);
-  timing_end ("Balance", fi, snapshot, &(stats[2]));
+  timing_end ("Balance", fi, snapshot, &(stats[3]));
 
   root_out () << "Balanced forest:    " << t8_forest_get_local_num_leaf_elements(balanced_forest)  << " local elements,    "<< t8_forest_get_global_num_leaf_elements(balanced_forest)  << " global elements\n";
 
